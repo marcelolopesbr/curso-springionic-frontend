@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Observable } from 'rxjs/Rx'; // IMPORTANTE: IMPORT ATUALIZADO
 import { StorageService } from '../services/storageservice';
+import { AlertController } from 'ionic-angular';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
-    constructor (public storage : StorageService) {
+    constructor (public storage : StorageService, public alertCtr: AlertController) {
 
     }
 
@@ -24,13 +26,15 @@ export class ErrorInterceptor implements HttpInterceptor {
                 errorObj = JSON.parse(errorObj);
             }
 
-            console.log("ERROR!!!!");
-            console.log(errorObj.status);
-
-
             switch(errorObj.status) {
                 case 403:
                     this.handle403();
+                    break;
+                case 401:
+                    this.handle401();
+                    break;
+                default:
+                    this.handleDefault(errorObj);
                     break;
             }
 
@@ -44,6 +48,37 @@ export class ErrorInterceptor implements HttpInterceptor {
     handle403() {
         this.storage.setLocalUser(null);
     }
+
+    handle401() {
+        this.storage.setLocalUser(null);
+        let alert = this.alertCtr.create({
+            title: 'Erro 401',
+            message: 'Usuário ou senha incorretos',
+            enableBackdropDismiss : false,
+            buttons: [
+                {
+                    text: 'Ok'
+                }
+            ]
+        });
+        alert.present();
+    }
+
+    handleDefault(errorObj) {
+        let alert = this.alertCtr.create({
+            title: 'Erro' + errorObj.status + ' : ' + errorObj.error,
+            message: errorObj.message,
+            enableBackdropDismiss : false,
+            buttons: [
+                {
+                    text: 'Ok'
+                }
+            ]
+        });
+        alert.present();
+    }
+
+
 }
 
 export const ErrorInterceptorProvider = {
