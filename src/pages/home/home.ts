@@ -30,11 +30,17 @@ export class HomePage {
         this.navCtrl.setRoot("CategoriasPage");        
       },
       error => {
-        if (error.status == 403) {
-          console.log("Nao deu");
-        }
-
       });
+  }
+
+  ionViewDidEnter() {
+    this.auth.refreshToken().
+      subscribe(response => {
+        this.auth.sucessfulLogin(response.headers.get('Authorization'));
+        this.navCtrl.setRoot("CategoriasPage");        
+      },
+      error => {
+      });    
   }
 
   ionViewWillEnter() {
