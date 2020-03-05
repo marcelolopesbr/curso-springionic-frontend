@@ -25,11 +25,16 @@ export class CategoriasPage {
   }
 
   ionViewDidLoad() {
+    console.log("Categoria carregada");
     this.categoriaService.findAll().
       subscribe(response => {
         this.items = response;
       },
-      error => {})
+      error => {
+        if (error.status = 401) {
+          this.navCtrl.setRoot('HomePage');
+        }
+      })
 
   }
 

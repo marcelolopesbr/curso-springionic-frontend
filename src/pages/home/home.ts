@@ -29,7 +29,12 @@ export class HomePage {
         this.auth.sucessfulLogin(response.headers.get('Authorization'));
         this.navCtrl.setRoot("CategoriasPage");        
       },
-      error => {});
+      error => {
+        if (error.status == 403) {
+          console.log("Nao deu");
+        }
+
+      });
   }
 
   ionViewWillEnter() {
